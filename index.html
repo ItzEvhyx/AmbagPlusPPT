@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ambag+ — Web for Impact</title>
+  <link rel="icon" type="image/png" href="assets/logos/ambag_solo_logo.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <style>
+  @font-face {
+    font-family: 'Batangas';
+    src: url('assets/fonts/Batangas Bold 700.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --paper:      #f5f2eb;
+    --paper-2:    #ede9df;
+    --paper-3:    #e4dfd3;
+    --forest:     #1a4731;
+    --forest-2:   #245c3f;
+    --moss:       #3a7a56;
+    --lime:       #5db870;
+    --lime-light: #d4f0dc;
+    --lime-mid:   #9cd9ab;
+    --gold:       #c8962a;
+    --gold-light: #f5e8c8;
+    --ember:      #d95f3b;
+    --ink:        #1a1f1c;
+    --muted:      #6b7a72;
+    --border:     rgba(26,71,49,.1);
+    --border-strong: rgba(26,71,49,.2);
+    --card-bg:    rgba(255,255,255,.72);
+    --card-bg-2:  rgba(245,242,235,.8);
+    --shadow-sm:  0 2px 8px rgba(26,71,49,.06);
+    --shadow-md:  0 8px 32px rgba(26,71,49,.1);
+    --shadow-lg:  0 24px 64px rgba(26,71,49,.14);
+    --r-sm: 8px; --r-md: 16px; --r-lg: 24px; --r-xl: 36px;
+    --ease: cubic-bezier(.4,0,.2,1);
+    --spring: cubic-bezier(.34,1.56,.64,1);
+    --font-display: 'Batangas', 'Inter', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'Space Mono', monospace;
+  }
+
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{
+    font-family:var(--font-body);
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.65;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+  img{display:block;max-width:100%}
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar{width:4px}
+  ::-webkit-scrollbar-track{background:var(--paper-2)}
+  ::-webkit-scrollbar-thumb{background:var(--moss);border-radius:2px}
+
+  /* ── PROGRESS ── */
+  #progress{position:fixed;top:0;left:0;height:3px;width:0;
+    background:linear-gradient(90deg,var(--forest),var(--lime));
+    z-index:1001;transition:width .05s linear}
+
+  /* ── ORGANIC BG SHAPES ── */
+  #org-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .org-blob{position:absolute;border-radius:60% 40% 70% 30% / 50% 60% 40% 50%;filter:blur(80px);opacity:.18}
+  .ob1{width:400px;height:350px;background:var(--lime-light);top:-100px;right:-150px;animation:morph1 12s ease-in-out infinite}
+  .ob2{width:300px;height:300px;background:var(--gold-light);bottom:-80px;left:-100px;animation:morph2 16s ease-in-out infinite}
+  .ob3{width:250px;height:250px;background:var(--lime-mid);top:50%;left:30%;animation:morph3 14s ease-in-out infinite}
+  @keyframes morph1{
+    0%,100%{border-radius:60% 40% 70% 30%/50% 60% 40% 50%;transform:translate(0,0) rotate(0deg)}
+    33%{border-radius:40% 60% 30% 70%/60% 40% 60% 40%;transform:translate(20px,-15px) rotate(5deg)}
+    66%{border-radius:70% 30% 50% 50%/30% 70% 50% 50%;transform:translate(-15px,20px) rotate(-3deg)}
+  }
+  @keyframes morph2{
+    0%,100%{border-radius:40% 60% 60% 40%/60% 30% 70% 40%;transform:translate(0,0)}
+    50%{border-radius:60% 40% 40% 60%/40% 70% 30% 60%;transform:translate(25px,-20px)}
+  }
+  @keyframes morph3{
+    0%,100%{border-radius:50% 50% 40% 60%/40% 60% 50% 50%;transform:translate(0,0) scale(1)}
+    50%{border-radius:60% 40% 60% 40%/50% 40% 60% 50%;transform:translate(-15px,15px) scale(1.1)}
+  }
+
+  /* ── TOPOGRAPHIC LINES ── */
+  .topo-overlay{
+    position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.04;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cpath d='M 0 200 Q 50 150 100 200 Q 150 250 200 200 Q 250 150 300 200 Q 350 250 400 200' fill='none' stroke='%231a4731' stroke-width='1.5'/%3E%3Cpath d='M 0 240 Q 50 190 100 240 Q 150 290 200 240 Q 250 190 300 240 Q 350 290 400 240' fill='none' stroke='%231a4731' stroke-width='1.5'/%3E%3Cpath d='M 0 160 Q 50 110 100 160 Q 150 210 200 160 Q 250 110 300 160 Q 350 210 400 160' fill='none' stroke='%231a4731' stroke-width='1.5'/%3E%3Cpath d='M 0 280 Q 50 230 100 280 Q 150 330 200 280 Q 250 230 300 280 Q 350 330 400 280' fill='none' stroke='%231a4731' stroke-width='1.5'/%3E%3Cpath d='M 0 120 Q 50 70 100 120 Q 150 170 200 120 Q 250 70 300 120 Q 350 170 400 120' fill='none' stroke='%231a4731' stroke-width='1.5'/%3E%3C/svg%3E");
+    background-size:400px 400px;
+  }
+
+  /* ══════════════════════════════════════
+     NAV — MOBILE FIRST
+  ══════════════════════════════════════ */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 1rem;height:56px;
+    background:rgba(245,242,235,.95);
+    backdrop-filter:blur(24px);
+    border-bottom:1px solid var(--border);
+    transition:background .3s;
+  }
+  .nav-logo{display:flex;align-items:center;gap:.5rem;flex:1}
+  .nav-logo img{height:28px;width:auto;object-fit:contain}
+  .nav-logo-text{
+    font-family:var(--font-display);font-size:1rem;font-weight:700;
+    color:var(--forest);letter-spacing:-.01em;
+  }
+  .nav-logo-text span{color:var(--lime)}
+
+  /* Desktop nav links — hidden on mobile */
+  .nav-links{display:none;gap:1.4rem;list-style:none}
+  .nav-links a{
+    font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;
+    color:var(--muted);font-weight:500;
+    transition:color .2s;position:relative;font-family:var(--font-body);
+    white-space:nowrap;
+  }
+  .nav-links a::after{
+    content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;
+    background:var(--forest);border-radius:1px;transition:width .3s var(--ease);
+  }
+  .nav-links a:hover,.nav-links a.active{color:var(--forest)}
+  .nav-links a:hover::after,.nav-links a.active::after{width:100%}
+
+  .nav-tag{
+    font-family:var(--font-mono);font-size:.55rem;color:var(--muted);
+    background:var(--paper-2);padding:.25rem .55rem;border-radius:100px;
+    border:1px solid var(--border);white-space:nowrap;flex-shrink:0;
+  }
+
+  /* Hamburger button */
+  .nav-hamburger{
+    display:flex;flex-direction:column;justify-content:center;gap:5px;
+    width:38px;height:38px;padding:6px;
+    background:transparent;border:1px solid var(--border);border-radius:8px;
+    cursor:pointer;flex-shrink:0;margin-left:.5rem;
+    transition:background .2s;
+  }
+  .nav-hamburger:hover{background:var(--lime-light)}
+  .nav-hamburger span{
+    width:100%;height:2px;background:var(--forest);border-radius:1px;
+    transition:transform .3s var(--ease),opacity .3s;transform-origin:center;
+  }
+  .nav-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .nav-hamburger.open span:nth-child(2){opacity:0}
+  .nav-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+  /* Mobile drawer */
+  .mobile-menu{
+    position:fixed;top:56px;left:0;right:0;
+    background:rgba(245,242,235,.98);
+    backdrop-filter:blur(24px);
+    border-bottom:1px solid var(--border);
+    z-index:99;
+    max-height:0;overflow:hidden;
+    transition:max-height .35s var(--ease);
+  }
+  .mobile-menu.open{max-height:400px}
+  .mobile-menu ul{list-style:none;padding:.5rem 0}
+  .mobile-menu ul li a{
+    display:block;padding:.9rem 1.5rem;
+    font-family:var(--font-body);font-size:.88rem;font-weight:500;
+    color:var(--muted);letter-spacing:.04em;
+    border-bottom:1px solid var(--border);
+    transition:color .2s,background .2s;
+  }
+  .mobile-menu ul li:last-child a{border-bottom:none}
+  .mobile-menu ul li a:hover{color:var(--forest);background:rgba(93,184,112,.06)}
+
+  /* ══════════════════════════════════════
+     SECTION BASE
+  ══════════════════════════════════════ */
+  .section{
+    position:relative;z-index:1;
+    min-height:auto;
+    padding:80px 1.2rem 60px;
+    display:flex;flex-direction:column;justify-content:center;
+  }
+  .section+.section{border-top:1px solid var(--border)}
+
+  .section-num{
+    font-family:var(--font-mono);font-size:.58rem;letter-spacing:.2em;
+    color:var(--moss);opacity:.5;margin-bottom:.4rem;text-transform:uppercase;
+  }
+  h2.section-title{
+    font-family:var(--font-display);font-size:clamp(1.8rem,7vw,3.5rem);
+    font-weight:700;line-height:1.0;letter-spacing:-.01em;
+    color:var(--forest);margin-bottom:1.5rem;
+  }
+  h2.section-title em{
+    font-style:italic;font-family:'Georgia',serif;
+    color:var(--moss);font-weight:400;
+  }
+
+  /* ── REVEAL ANIMATIONS ── */
+  .reveal{opacity:0;transform:translateY(20px);transition:opacity .55s var(--ease),transform .55s var(--ease)}
+  .reveal.in{opacity:1;transform:translateY(0)}
+  .reveal.d1{transition-delay:.05s}.reveal.d2{transition-delay:.1s}
+  .reveal.d3{transition-delay:.15s}.reveal.d4{transition-delay:.2s}
+  .reveal.d5{transition-delay:.25s}.reveal.d6{transition-delay:.3s}
+  .reveal-l{opacity:0;transform:translateX(-20px);transition:opacity .55s var(--ease),transform .55s var(--ease)}
+  .reveal-l.in{opacity:1;transform:translateX(0)}
+  .reveal-r{opacity:0;transform:translateX(20px);transition:opacity .55s var(--ease),transform .55s var(--ease)}
+  .reveal-r.in{opacity:1;transform:translateX(0)}
+
+  /* ── CARD ── */
+  .card{
+    background:var(--card-bg);border:1px solid var(--border);
+    border-radius:var(--r-lg);padding:1.2rem;
+    backdrop-filter:blur(12px);box-shadow:var(--shadow-sm);
+    transition:border-color .3s,box-shadow .3s;
+  }
+  .card:hover{border-color:var(--border-strong);box-shadow:var(--shadow-md)}
+  .card-label{
+    font-family:var(--font-mono);font-size:.56rem;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--moss);margin-bottom:.6rem;
+  }
+
+  .chip{
+    display:inline-flex;align-items:center;gap:.4rem;
+    background:var(--lime-light);border:1px solid rgba(93,184,112,.25);
+    border-radius:100px;padding:.25rem .7rem;
+    font-size:.68rem;font-family:var(--font-mono);letter-spacing:.1em;
+    text-transform:uppercase;color:var(--forest);
+  }
+
+  /* ══════════════════════════════════════
+     01 — COVER
+  ══════════════════════════════════════ */
+  #cover{
+    min-height:100svh;padding-top:80px;padding-bottom:60px;
+    background:
+      radial-gradient(ellipse 80% 50% at 80% 20%,rgba(212,240,220,.5) 0%,transparent 70%),
+      radial-gradient(ellipse 60% 50% at 10% 90%,rgba(245,232,200,.45) 0%,transparent 70%);
+  }
+  .cover-inner{max-width:100%}
+  .cover-eyebrow{
+    display:flex;align-items:center;gap:.6rem;margin-bottom:1.2rem;flex-wrap:wrap;
+  }
+  .live-dot{
+    width:7px;height:7px;background:var(--lime);border-radius:50%;
+    animation:pulse-dot 2.5s ease-in-out infinite;flex-shrink:0;
+  }
+  @keyframes pulse-dot{
+    0%,100%{box-shadow:0 0 0 0 rgba(93,184,112,.5)}
+    50%{box-shadow:0 0 0 7px rgba(93,184,112,0)}
+  }
+  .cover-logo-big{height:56px;width:auto;margin-bottom:.8rem}
+  .cover-title{
+    font-family:var(--font-display);
+    font-size:clamp(3.8rem,18vw,10.5rem);
+    font-weight:700;line-height:.9;
+    letter-spacing:-.03em;
+    color:var(--forest);margin-bottom:.8rem;
+  }
+  .cover-title .plus{
+    color:var(--lime);display:inline-block;
+    animation:plus-pulse 3s ease-in-out infinite;
+  }
+  @keyframes plus-pulse{
+    0%,100%{transform:scale(1) rotate(0deg)}
+    50%{transform:scale(1.08) rotate(4deg)}
+  }
+  .cover-tagline{
+    font-family:'Georgia',serif;font-size:clamp(.9rem,3.5vw,1.45rem);
+    font-style:italic;color:var(--muted);
+    margin-bottom:1.8rem;line-height:1.5;
+  }
+  .cover-meta{
+    display:grid;grid-template-columns:1fr;
+    gap:1px;background:var(--border);
+    border-radius:var(--r-lg);overflow:hidden;
+    border:1px solid var(--border);
+    box-shadow:var(--shadow-sm);
+  }
+  .cover-meta-cell{
+    background:var(--card-bg);padding:1rem 1.2rem;
+    backdrop-filter:blur(12px);
+  }
+  .cover-meta-cell .lbl{
+    font-family:var(--font-mono);font-size:.52rem;letter-spacing:.15em;
+    text-transform:uppercase;color:var(--moss);opacity:.7;margin-bottom:.25rem;
+  }
+  .cover-meta-cell strong{
+    display:block;font-size:.82rem;color:var(--forest);
+    font-weight:600;line-height:1.3;font-family:var(--font-body);
+  }
+  .cover-members{
+    margin-top:1.2rem;display:flex;gap:.5rem;flex-wrap:wrap;
+  }
+  .member-chip{
+    display:flex;align-items:center;gap:.4rem;
+    background:rgba(26,71,49,.06);border:1px solid rgba(26,71,49,.1);
+    border-radius:100px;padding:.3rem .75rem;
+    font-size:.75rem;color:var(--forest);font-weight:500;
+  }
+  .scroll-hint{
+    margin-top:2rem;
+    display:flex;align-items:center;gap:.6rem;
+    font-family:var(--font-mono);font-size:.56rem;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--muted);opacity:.5;
+  }
+  .scroll-line{
+    width:32px;height:1px;background:var(--border-strong);overflow:hidden;position:relative;
+  }
+  .scroll-line::after{
+    content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
+    background:var(--forest);animation:scan 1.8s ease-in-out infinite;
+  }
+  @keyframes scan{0%{left:-100%}100%{left:100%}}
+
+  /* ══════════════════════════════════════
+     02 — ROADMAP
+  ══════════════════════════════════════ */
+  #roadmap{padding:60px 1.2rem}
+  .roadmap-track{
+    display:flex;flex-direction:column;gap:.55rem;margin-top:1.5rem;
+  }
+  .r-step{
+    display:flex;align-items:center;gap:1rem;
+    padding:.7rem 1rem;
+    background:var(--card-bg);border:1px solid var(--border);
+    border-radius:var(--r-md);box-shadow:var(--shadow-sm);
+    transition:border-color .3s,transform .3s var(--spring);
+  }
+  .r-step:hover{border-color:var(--border-strong);transform:translateX(4px)}
+  .r-node{
+    width:40px;height:40px;min-width:40px;border-radius:50%;
+    background:var(--lime-light);border:2px solid rgba(93,184,112,.3);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-mono);font-size:.65rem;color:var(--forest);font-weight:700;
+    flex-shrink:0;
+  }
+  .r-step h3{font-family:var(--font-display);font-size:.82rem;font-weight:700;line-height:1.3;color:var(--muted)}
+  .r-arrow{display:none}
+
+  /* ══════════════════════════════════════
+     03 — PROBLEM
+  ══════════════════════════════════════ */
+  .problem-layout{display:flex;flex-direction:column;gap:1.5rem}
+  .problem-statement{
+    border-left:3px solid var(--forest);padding-left:1.2rem;margin-bottom:1.2rem;
+  }
+  .problem-statement p{font-size:.88rem;line-height:1.8;color:var(--ink);opacity:.85}
+  .pain-card{
+    display:flex;align-items:flex-start;gap:.8rem;
+    padding:.9rem 1rem;
+    background:var(--card-bg);border:1px solid var(--border);
+    border-radius:var(--r-md);box-shadow:var(--shadow-sm);
+    margin-bottom:.6rem;
+    transition:border-color .3s,transform .3s var(--spring),box-shadow .3s;
+  }
+  .pain-card:hover{border-color:var(--border-strong);box-shadow:var(--shadow-md)}
+  .pain-icon{
+    width:34px;height:34px;min-width:34px;
+    background:var(--lime-light);border:1px solid rgba(93,184,112,.2);
+    border-radius:9px;display:flex;align-items:center;justify-content:center;
+    color:var(--forest);
+  }
+  .pain-icon i{width:15px;height:15px}
+  .pain-lbl{font-family:var(--font-mono);font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;color:var(--moss);margin-bottom:.2rem}
+  .ev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem;margin-top:1.2rem}
+  .ev-card{
+    aspect-ratio:unset;padding:.85rem;
+    border-radius:var(--r-md);
+    background:var(--card-bg);border:1px solid var(--border);
+    display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;
+    gap:.3rem;
+    box-shadow:var(--shadow-sm);
+    transition:border-color .3s,box-shadow .3s;
+  }
+  .ev-card:hover{border-color:var(--border-strong);box-shadow:var(--shadow-md)}
+  .ev-card i{color:var(--moss);width:17px;height:17px}
+  .ev-lbl{font-family:var(--font-mono);font-size:.57rem;letter-spacing:.12em;text-transform:uppercase;color:var(--forest);font-weight:700}
+  .ev-desc{font-size:.7rem;color:var(--muted);line-height:1.35}
+
+  /* ══════════════════════════════════════
+     04 — SDG
+  ══════════════════════════════════════ */
+  #sdg{background:radial-gradient(ellipse 80% 50% at 80% 30%,rgba(212,240,220,.4),transparent)}
+  .sdg-layout{display:flex;flex-direction:column;gap:1.5rem}
+  .sdg-badge{
+    width:140px;height:140px;border-radius:50%;
+    background:conic-gradient(from 0deg,var(--lime-light),var(--gold-light),rgba(212,240,220,.5),var(--lime-light));
+    border:2px solid rgba(93,184,112,.3);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:1rem;box-shadow:var(--shadow-md);
+    animation:badge-glow 4s ease-in-out infinite;
+    position:relative;margin:0 auto;
+  }
+  .sdg-badge::before{
+    content:'';position:absolute;inset:7px;border-radius:50%;
+    background:var(--paper);
+  }
+  .sdg-inner{position:relative;z-index:1}
+  @keyframes badge-glow{
+    0%,100%{box-shadow:var(--shadow-md),0 0 0 0 rgba(93,184,112,0)}
+    50%{box-shadow:var(--shadow-lg),0 0 20px rgba(93,184,112,.15)}
+  }
+  .sdg-num{font-family:var(--font-display);font-size:3rem;font-weight:700;color:var(--forest);line-height:1}
+  .sdg-sub{font-family:var(--font-mono);font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:.2rem}
+  .sdg-matrix{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-top:1rem}
+  .sdg-cell{
+    padding:.9rem 1rem;background:var(--card-bg);border:1px solid var(--border);
+    border-radius:var(--r-md);box-shadow:var(--shadow-sm);
+  }
+  .sdg-cell .cell-lbl{font-family:var(--font-mono);font-size:.54rem;letter-spacing:.14em;text-transform:uppercase;color:var(--moss);margin-bottom:.35rem}
+  .sdg-cell p{font-size:.8rem;color:var(--ink);opacity:.8}
+
+  /* ══════════════════════════════════════
+     05 — TARGET USERS
+  ══════════════════════════════════════ */
+  .users-grid{display:flex;flex-direction:column;gap:1.5rem}
+  .user-tag{
+    display:flex;align-items:center;gap:.8rem;
+    padding:.75rem 1rem;background:var(--card-bg);border:1px solid var(--border);
+    border-radius:var(--r-md);box-shadow:var(--shadow-sm);margin-bottom:.5rem;
+    transition:border-color .3s,transform .3s var(--spring),box-shadow .3s;
+  }
+  .user-tag:hover{border-color:var(--border-strong);transform:translateX(4px);box-shadow:var(--shadow-md)}
+  .user-tag-ico{
+    width:30px;height:30px;min-width:30px;
+    background:var(--lime-light);border-radius:7px;
+    display:flex;align-items:center;justify-content:center;color:var(--forest);
+  }
+  .user-tag-ico i{width:13px;height:13px}
+  .user-tag-name{font-size:.85rem;font-weight:600;color:var(--forest)}
+  .needs-grid{display:grid;grid-template-columns:1fr;gap:.7rem;margin-top:.9rem}
+  .needs-card{
+    padding:1rem;background:var(--card-bg);border:1px solid var(--border);
+    border-radius:var(--r-md);box-shadow:var(--shadow-sm);
+  }
+  .list-item{display:flex;gap:.55rem;align-items:flex-start;font-size:.81rem;margin-bottom:.45rem;color:var(--ink)}
+  .list-item i{width:13px;height:13px;min-width:13px;margin-top:.2rem;flex-shrink:0}
+  .list-item:last-child{margin-bottom:0}
+
+  /* ══════════════════════════════════════
+     PERSONA DECK — MOBILE OPTIMIZED
+  ══════════════════════════════════════ */
+  .personas-section{margin-top:2rem}
+  .personas-label{
+    font-family:var(--font-mono);font-size:.6rem;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--moss);margin-bottom:1.2rem;
+  }
+  .deck-container{display:flex;flex-direction:column;gap:2rem}
+  .deck-wrapper{
+    position:relative;
+    width:100%;max-width:420px;
+    height:320px;
+    margin:0 auto;
+  }
+  .deck-wrapper::before{
+    content:'';position:absolute;
+    bottom:-14px;left:50%;transform:translateX(-50%);
+    width:90%;height:100%;
+    background:var(--paper-3);border-radius:var(--r-xl);
+    box-shadow:var(--shadow-sm);
+  }
+  .deck-wrapper::after{
+    content:'';position:absolute;
+    bottom:-7px;left:50%;transform:translateX(-50%);
+    width:95%;height:100%;
+    background:var(--paper-2);border-radius:var(--r-xl);
+    box-shadow:var(--shadow-sm);
+  }
+  .persona-deck{position:relative;z-index:1;width:100%;height:320px}
+  .p-card{
+    position:absolute;inset:0;
+    background:var(--card-bg);
+    border:1.5px solid var(--border);
+    border-radius:var(--r-xl);
+    padding:1.5rem 1.5rem 1.2rem;
+    box-shadow:var(--shadow-lg);
+    backdrop-filter:blur(16px);
+    cursor:pointer;
+    transition:transform .45s var(--ease),box-shadow .45s var(--ease),opacity .35s var(--ease);
+    display:flex;flex-direction:column;gap:.8rem;
+    overflow:hidden;will-change:transform;
+  }
+  .p-card.is-top{z-index:10;transform:translateY(0) rotate(0deg) scale(1);opacity:1;box-shadow:var(--shadow-lg)}
+  .p-card.is-2nd{z-index:9;transform:translateY(5px) rotate(1.5deg) scale(.97);opacity:.9;box-shadow:var(--shadow-md)}
+  .p-card.is-3rd{z-index:8;transform:translateY(10px) rotate(-1.2deg) scale(.94);opacity:.75;box-shadow:var(--shadow-sm)}
+  .p-card.is-hidden{z-index:7;transform:translateY(14px) scale(.91);opacity:0;pointer-events:none}
+  .p-card.flying{
+    transform:translateY(-110%) rotate(-8deg) scale(.95)!important;
+    opacity:0!important;
+    transition:transform .4s var(--ease),opacity .3s var(--ease)!important;
+    pointer-events:none;
+  }
+  .p-card-header{display:flex;align-items:center;gap:1rem}
+  .p-avatar{
+    width:58px;height:58px;border-radius:50%;
+    border:2.5px solid rgba(26,71,49,.15);
+    object-fit:cover;flex-shrink:0;
+    background:var(--lime-light);
+    display:flex;align-items:center;justify-content:center;overflow:hidden;
+  }
+  .p-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+  .p-avatar-placeholder{color:rgba(26,71,49,.25)}
+  .p-avatar-placeholder i{width:24px;height:24px}
+  .p-name{font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--forest);line-height:1.1}
+  .p-role{font-family:var(--font-mono);font-size:.56rem;letter-spacing:.12em;text-transform:uppercase;color:var(--moss);margin-top:.25rem}
+  .p-stars{display:flex;gap:2px;margin-top:.25rem}
+  .p-stars svg{width:11px;height:11px;fill:var(--gold)}
+  .p-quote{
+    font-family:'Georgia',serif;font-size:.9rem;font-style:italic;
+    color:var(--ink);opacity:.85;line-height:1.55;
+    border-left:3px solid var(--lime-light);padding-left:.85rem;
+  }
+  .p-goal{
+    font-family:var(--font-mono);font-size:.56rem;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--moss);
+    background:var(--lime-light);padding:.35rem .8rem;border-radius:100px;
+    display:inline-block;width:fit-content;
+  }
+  .p-pain{font-size:.76rem;color:var(--muted);line-height:1.45}
+  .p-card::after{
+    content:'';position:absolute;top:0;right:0;
+    width:70px;height:70px;
+    background:radial-gradient(circle at top right,var(--lime-light),transparent 70%);
+    border-radius:0 var(--r-xl) 0 0;opacity:.6;
+  }
+  .deck-hint{
+    text-align:center;margin-top:2.5rem;
+    font-family:var(--font-mono);font-size:.56rem;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);opacity:.5;
+    display:flex;align-items:center;justify-content:center;gap:.4rem;
+  }
+  .deck-hint i{width:12px;height:12px}
+  .deck-counter{display:flex;gap:.5rem;align-items:center;margin-top:.8rem;justify-content:center}
+  .deck-dot{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--border-strong);
+    transition:background .3s,transform .3s var(--spring);
+    cursor:pointer;
+  }
+  .deck-dot.active{background:var(--forest);transform:scale(1.4)}
+
+  /* Mini personas — stacked on mobile */
+  .deck-row-2{display:flex;flex-direction:column;gap:.7rem}
+  .mini-persona{
+    display:flex;align-items:flex-start;gap:.8rem;
+    padding:.9rem 1rem;
+    background:var(--card-bg);border:1px solid var(--border);
+    border-radius:var(--r-lg);box-shadow:var(--shadow-sm);
+    transition:border-color .3s,transform .3s var(--spring),box-shadow .3s;
+  }
+  .mini-persona:hover{border-color:var(--border-strong);transform:translateY(-3px);box-shadow:var(--shadow-md)}
+  .mini-av{
+    width:40px;height:40px;border-radius:50%;border:1.5px solid var(--border-strong);
+    background:var(--lime-light);display:flex;align-items:center;justify-content:center;
+    color:var(--muted);flex-shrink:0;
+  }
+  .mini-av i{width:16px;height:16px}
+  .mini-name{font-family:var(--font-display);font-size:.88rem;font-weight:700;color:var(--forest)}
+  .mini-role{font-family:var(--font-mono);font-size:.53rem;letter-spacing:.1em;text-transform:uppercase;color:var(--moss);margin-top:.12rem}
+  .mini-quote{font-size:.77rem;color:var(--muted);font-style:italic;margin-top:.35rem;line-height:1.4}
+  .mini-goal{font-family:var(--font-mono);font-size:.53rem;letter-spacing:.1em;text-transform:uppercase;color:var(--forest);margin-top:.45rem;opacity:.6}
+
+  /* ══════════════════════════════════════
+     06 — OBJECTIVES
+  ══════════════════════════════════════ */
+  #objectives{min-height:auto}
+  .obj-list{display:flex;flex-direction:column;gap:.55rem;counter-reset:obj}
+  .obj{
+    display:flex;align-items:flex-start;gap:.9rem;
+    padding:.9rem 1rem;counter-increment:obj;
+    background:var(--card-bg);border:1px solid var(--border);
+    border-radius:var(--r-md);box-shadow:var(--shadow-sm);
+    transition:border-color .3s,transform .3s var(--spring),box-shadow .3s;
+  }
+  .obj:hover{border-color:var(--border-strong);transform:translateX(4px);box-shadow:var(--shadow-md)}
+  .obj-num{
+    font-family:var(--font-display);font-size:1.5rem;font-weight:700;
+    color:rgba(26,71,49,.15);min-width:2rem;line-height:1;flex-shrink:0;
+    transition:color .3s;
+  }
+  .obj:hover .obj-num{color:#1A4731}
+  .obj p{font-size:.85rem;line-height:1.65;color:var(--ink);opacity:.85}
+
+  /* ══════════════════════════════════════
+     07 — OVERVIEW
+  ══════════════════════════════════════ */
+  #overview{min-height:auto}
+  .pitch-block{
+    background:linear-gradient(90deg,rgba(93,184,112,.08),rgba(245,242,235,.3));
+    border-left:3px solid var(--forest);
+    border-radius:0 var(--r-lg) var(--r-lg) 0;
+    padding:1.4rem 1.5rem;margin-bottom:1.2rem;
+    position:relative;overflow:hidden;
+  }
+  .pitch-block::before{
+    content:'"';position:absolute;right:1rem;top:-1rem;
+    font-family:'Georgia',serif;font-size:6rem;color:rgba(26,71,49,.06);line-height:1;
+  }
+  .pitch-block blockquote{
+    font-family:'Georgia',serif;font-size:clamp(.9rem,3.5vw,1.3rem);
+    font-style:italic;color:var(--forest);line-height:1.6;position:relative;z-index:1;
+  }
+  .two-col{display:grid;grid-template-columns:1fr;gap:.9rem}
+
+  /* ══════════════════════════════════════
+     08 — SITE MAP
+  ══════════════════════════════════════ */
+  .sitemap-flow{
+    display:flex;flex-wrap:wrap;gap:.5rem;
+    margin-bottom:1.5rem;
+  }
+  .s-box{
+    padding:.5rem .9rem;background:var(--card-bg);border:1.5px solid var(--border);
+    border-radius:var(--r-md);font-family:var(--font-display);font-size:.78rem;font-weight:700;
+    color:var(--muted);white-space:nowrap;box-shadow:var(--shadow-sm);
+    transition:border-color .3s,color .3s,background .3s;cursor:default;
+  }
+  .s-box:hover,.s-box.active{border-color:var(--forest);color:var(--forest);background:var(--lime-light)}
+  .s-arr{display:none}
+  .map-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r-lg)}
+  .map-table{width:100%;border-collapse:collapse;min-width:520px}
+  .map-table th{
+    text-align:left;font-family:var(--font-mono);font-size:.55rem;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--moss);
+    padding:.65rem .9rem;border-bottom:2px solid var(--border);
+    white-space:nowrap;
+  }
+  .map-table td{padding:.65rem .9rem;font-size:.82rem;border-bottom:1px solid var(--border);vertical-align:top}
+  .map-table tr:hover td{background:rgba(93,184,112,.04)}
+  .map-table td:first-child{font-family:var(--font-display);font-weight:700;font-size:.82rem;color:var(--forest);white-space:nowrap}
+
+  /* ══════════════════════════════════════
+     09 — FEATURES
+  ══════════════════════════════════════ */
+  #features{background:radial-gradient(ellipse 80% 50% at 5% 30%,rgba(245,232,200,.35),transparent)}
+  .features-grid{display:grid;grid-template-columns:1fr;gap:.9rem}
+  .feat{
+    background:var(--card-bg);border:1.5px solid var(--border);
+    border-radius:var(--r-xl);padding:1.4rem;position:relative;overflow:hidden;
+    box-shadow:var(--shadow-sm);
+    transition:border-color .3s,transform .3s var(--spring),box-shadow .3s;
+  }
+  .feat:hover{border-color:var(--forest);transform:translateY(-4px);box-shadow:var(--shadow-md)}
+  .feat::after{
+    content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,var(--forest),var(--lime));
+    transform:scaleX(0);transform-origin:left;transition:transform .4s var(--ease);
+  }
+  .feat:hover::after{transform:scaleX(1)}
+  .feat-icon{
+    width:42px;height:42px;background:var(--lime-light);border:1px solid rgba(93,184,112,.2);
+    border-radius:11px;display:flex;align-items:center;justify-content:center;
+    color:var(--forest);margin-bottom:1rem;
+  }
+  .feat-icon i{width:18px;height:18px}
+  .feat h3{font-family:var(--font-display);font-size:.92rem;font-weight:700;margin-bottom:.5rem;color:var(--forest)}
+  .feat p{font-size:.81rem;color:var(--ink);opacity:.75;line-height:1.6}
+  .feat-benefit{margin-top:.8rem;padding-top:.8rem;border-top:1px solid var(--border)}
+  .feat-benefit-lbl{font-family:var(--font-mono);font-size:.54rem;letter-spacing:.12em;text-transform:uppercase;color:var(--moss);margin-bottom:.25rem}
+  .feat-benefit p{font-size:.78rem;color:var(--muted)}
+  .feat-extra{
+    display:flex;align-items:flex-start;gap:1rem;
+    padding:1.2rem;background:var(--card-bg);border:1.5px solid rgba(26,71,49,.12);
+    border-radius:var(--r-lg);margin-top:.9rem;box-shadow:var(--shadow-sm);
+    transition:border-color .3s;
+  }
+  .feat-extra:hover{border-color:var(--border-strong)}
+
+  /* ══════════════════════════════════════
+     10 — DESIGN
+  ══════════════════════════════════════ */
+  #design{min-height:auto}
+  .design-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r-lg)}
+  .design-table{width:100%;border-collapse:collapse;min-width:520px}
+  .design-table thead tr{background:rgba(93,184,112,.06)}
+  .design-table th{
+    text-align:left;font-family:var(--font-mono);font-size:.55rem;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--moss);
+    padding:.75rem 1rem;white-space:nowrap;
+  }
+  .design-table td{padding:.85rem 1rem;font-size:.83rem;border-bottom:1px solid var(--border);vertical-align:top;color:var(--ink)}
+  .design-table tr:hover td{background:rgba(93,184,112,.03)}
+  .design-table td:first-child{font-family:var(--font-display);font-weight:700;font-size:.83rem;color:var(--forest);white-space:nowrap}
+  .design-table td:nth-child(2){color:var(--forest);font-weight:500}
+
+  /* ══════════════════════════════════════
+     11 — TOOLS
+  ══════════════════════════════════════ */
+  #tools{min-height:auto}
+  .tools-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.65rem;margin-bottom:1rem}
+  .tool{
+    display:flex;flex-direction:column;align-items:center;gap:.55rem;
+    padding:1rem .7rem;text-align:center;
+    background:var(--card-bg);border:1px solid var(--border);
+    border-radius:var(--r-lg);box-shadow:var(--shadow-sm);
+    transition:border-color .3s,transform .3s var(--spring),box-shadow .3s;
+  }
+  .tool:hover{border-color:var(--border-strong);transform:translateY(-3px);box-shadow:var(--shadow-md)}
+  .tool-ico{width:34px;height:34px;background:var(--lime-light);border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--forest)}
+  .tool-ico i{width:15px;height:15px}
+  .tool-name{font-family:var(--font-display);font-size:.78rem;font-weight:700;color:var(--forest)}
+  .tool-desc{font-size:.64rem;color:var(--muted);line-height:1.3}
+  .repo-strip{
+    display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;
+    background:var(--lime-light);border:1px solid rgba(93,184,112,.25);
+    border-radius:var(--r-md);padding:.9rem 1.2rem;box-shadow:var(--shadow-sm);
+  }
+  .repo-strip a{color:var(--forest);font-family:var(--font-mono);font-size:.75rem;font-weight:700;letter-spacing:.02em;transition:opacity .2s;word-break:break-all}
+  .repo-strip a:hover{opacity:.65}
+  .repo-strip i{color:var(--forest);width:17px;height:17px;flex-shrink:0}
+
+  /* ══════════════════════════════════════
+     12 — TESTING
+  ══════════════════════════════════════ */
+  #testing{background:radial-gradient(ellipse 80% 50% at 80% 30%,rgba(212,240,220,.3),transparent)}
+  .testing-top{display:grid;grid-template-columns:1fr;gap:.9rem;margin-bottom:1rem}
+  .testing-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r-lg)}
+  .testing-table{width:100%;border-collapse:collapse;min-width:500px}
+  .testing-table th{
+    text-align:left;font-family:var(--font-mono);font-size:.55rem;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--moss);
+    padding:.65rem .9rem;background:rgba(93,184,112,.06);white-space:nowrap;
+  }
+  .testing-table td{padding:.7rem .9rem;font-size:.82rem;border-bottom:1px solid var(--border);color:var(--ink)}
+  .badge-fixed{
+    display:inline-block;background:var(--lime-light);border:1px solid rgba(93,184,112,.3);
+    color:var(--forest);font-size:.62rem;font-family:var(--font-mono);
+    padding:2px 7px;border-radius:4px;letter-spacing:.06em;font-weight:700;
+    white-space:nowrap;
+  }
+
+  /* ══════════════════════════════════════
+     13 — CHALLENGES
+  ══════════════════════════════════════ */
+  #challenges{min-height:auto}
+  .challenges-list{display:flex;flex-direction:column;gap:.7rem}
+  .chal{
+    display:flex;flex-direction:column;gap:0;
+    border-radius:var(--r-md);overflow:hidden;
+    border:1px solid var(--border);
+    transition:box-shadow .3s;
+  }
+  .chal:hover{box-shadow:var(--shadow-md)}
+  .chal-cell{padding:.9rem 1rem;background:var(--paper)}
+  .chal-cell:first-child{background:var(--card-bg);border-left:3px solid var(--forest)}
+  .chal-cell:not(:last-child){border-bottom:1px solid var(--border)}
+  .chal-cell .cell-lbl{font-family:var(--font-mono);font-size:.54rem;letter-spacing:.14em;text-transform:uppercase;color:var(--moss);margin-bottom:.35rem}
+  .chal-cell p{font-size:.81rem;line-height:1.5;color:var(--ink);opacity:.85}
+
+  /* ══════════════════════════════════════
+     14 — IMPACT
+  ══════════════════════════════════════ */
+  #impact{background:linear-gradient(180deg,transparent,rgba(212,240,220,.2),transparent)}
+  .impact-grid{display:grid;grid-template-columns:1fr;gap:.9rem;margin-bottom:1.5rem}
+  .impact-card{
+    padding:1.5rem 1.3rem;background:var(--card-bg);border:1.5px solid var(--border);
+    border-radius:var(--r-xl);box-shadow:var(--shadow-sm);
+    transition:border-color .3s,transform .3s var(--spring),box-shadow .3s;
+  }
+  .impact-card:hover{border-color:var(--forest);transform:translateY(-4px);box-shadow:var(--shadow-md)}
+  .impact-icon{
+    width:48px;height:48px;background:var(--lime-light);border:1px solid rgba(93,184,112,.2);
+    border-radius:12px;display:flex;align-items:center;justify-content:center;
+    color:var(--forest);margin:0 0 1rem;
+  }
+  .impact-icon i{width:20px;height:20px}
+  .impact-card h3{font-family:var(--font-display);font-size:.95rem;font-weight:700;color:var(--forest);margin-bottom:.6rem}
+  .impact-card p{font-size:.82rem;line-height:1.65;color:var(--ink);opacity:.8}
+  .closing{
+    background:linear-gradient(135deg,rgba(93,184,112,.08),rgba(200,150,42,.05));
+    border:1.5px solid rgba(26,71,49,.12);border-radius:var(--r-xl);
+    padding:1.8rem 1.5rem;box-shadow:var(--shadow-sm);
+  }
+  .closing blockquote{
+    font-family:'Georgia',serif;font-size:clamp(.9rem,3.5vw,1.3rem);
+    font-style:italic;color:var(--forest);line-height:1.6;
+  }
+
+  /* ══════════════════════════════════════
+     15 — DEMO
+  ══════════════════════════════════════ */
+  #demo{background:radial-gradient(ellipse 80% 50% at 5% 30%,rgba(212,240,220,.25),transparent)}
+  .demo-layout{display:flex;flex-direction:column;gap:1.2rem}
+  .demo-step{
+    display:flex;align-items:flex-start;gap:.8rem;padding:.85rem 1rem;
+    background:var(--card-bg);border:1px solid var(--border);
+    border-radius:var(--r-md);box-shadow:var(--shadow-sm);margin-bottom:.55rem;
+    transition:border-color .3s,transform .3s var(--spring);
+  }
+  .demo-step:hover{border-color:var(--border-strong);transform:translateX(4px)}
+  .step-num{
+    min-width:26px;height:26px;background:var(--lime-light);
+    border:1px solid rgba(93,184,112,.25);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-mono);font-size:.65rem;color:var(--forest);font-weight:700;flex-shrink:0;
+  }
+  .checklist{list-style:none;display:flex;flex-direction:column;gap:.45rem}
+  .checklist li{
+    display:flex;align-items:center;gap:.65rem;font-size:.84rem;padding:.5rem .75rem;
+    border:1px solid transparent;border-radius:var(--r-sm);cursor:pointer;
+    transition:border-color .2s,background .2s;color:var(--ink);
+  }
+  .checklist li:hover{border-color:var(--border);background:rgba(93,184,112,.05)}
+  .chk{
+    width:18px;height:18px;min-width:18px;border:1.5px solid rgba(26,71,49,.2);
+    border-radius:4px;display:flex;align-items:center;justify-content:center;
+    transition:border-color .2s,background .2s;
+  }
+  .chk.checked{background:var(--forest);border-color:var(--forest)}
+  .chk.checked i{color:var(--paper);width:11px;height:11px}
+
+  /* ══════════════════════════════════════
+     FOOTER
+  ══════════════════════════════════════ */
+  footer{
+    padding:1.5rem 1.2rem;border-top:1px solid var(--border);
+    display:flex;flex-direction:column;gap:.8rem;
+    position:relative;z-index:1;background:var(--paper-2);
+  }
+  .footer-logo{display:flex;align-items:center;gap:.5rem}
+  .footer-logo img{height:22px;opacity:.6}
+  .footer-logo span{font-family:var(--font-display);font-size:.85rem;font-weight:700;color:var(--muted)}
+  footer p{font-family:var(--font-mono);font-size:.58rem;color:var(--muted);opacity:.6;letter-spacing:.04em}
+
+  /* FLOATING SDG BADGE */
+  #sdg-float{
+    position:fixed;bottom:1.2rem;right:1.2rem;z-index:50;
+    width:48px;height:48px;
+    background:var(--forest);border-radius:50%;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    box-shadow:var(--shadow-md),0 0 0 4px rgba(26,71,49,.1);
+    cursor:pointer;
+    animation:float-bob 3s ease-in-out infinite;
+    transition:transform .3s var(--spring),box-shadow .3s;
+  }
+  #sdg-float:hover{transform:scale(1.12);box-shadow:var(--shadow-lg),0 0 0 6px rgba(26,71,49,.15)}
+  @keyframes float-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  #sdg-float span{font-family:var(--font-display);font-size:.88rem;font-weight:700;color:var(--paper);line-height:1}
+  #sdg-float small{font-family:var(--font-mono);font-size:.38rem;letter-spacing:.06em;text-transform:uppercase;color:rgba(245,242,235,.6)}
+
+  /* ══════════════════════════════════════
+     TABLET — 600px+
+  ══════════════════════════════════════ */
+  @media(min-width:600px){
+    nav{padding:0 1.5rem;height:60px}
+    .nav-tag{display:block}
+    .nav-hamburger{display:none!important}
+    .mobile-menu{display:none!important}
+    .nav-links{display:flex}
+
+    .section{padding:90px 3rem 70px}
+
+    .cover-meta{grid-template-columns:1fr 1fr}
+    .ev-grid{grid-template-columns:repeat(3,1fr)}
+    .needs-grid{grid-template-columns:1fr 1fr}
+    .two-col{grid-template-columns:1fr 1fr}
+    .features-grid{grid-template-columns:1fr 1fr}
+    .tools-grid{grid-template-columns:repeat(3,1fr)}
+    .testing-top{grid-template-columns:1fr 1fr}
+    .impact-grid{grid-template-columns:1fr 1fr}
+    .sdg-matrix{grid-template-columns:1fr 1fr}
+
+    .roadmap-track{flex-direction:row;align-items:flex-start}
+    .r-step{text-align:center;flex:1}
+    .r-step h3{font-size:.78rem}
+    .r-arrow{display:block;padding-top:20px;color:var(--border-strong);font-size:.7rem;text-align:center;flex-shrink:0}
+    .r-node{margin:0 auto 1rem}
+
+    .chal{display:grid;grid-template-columns:1fr 1fr 1fr}
+    .chal-cell:not(:last-child){border-bottom:none}
+
+    .deck-wrapper{height:340px}
+    .persona-deck{height:340px}
+  }
+
+  /* ══════════════════════════════════════
+     DESKTOP — 960px+
+  ══════════════════════════════════════ */
+  @media(min-width:960px){
+    nav{padding:0 3rem;height:64px}
+
+    .section{
+      min-height:100vh;
+      padding:110px 6vw 90px;
+    }
+    #roadmap{min-height:auto;padding:80px 6vw}
+    #objectives,#overview,#design,#tools,#testing,#challenges{min-height:auto}
+
+    .cover-meta{grid-template-columns:repeat(3,1fr)}
+    .ev-grid{grid-template-columns:repeat(3,1fr)}
+    .problem-layout{display:grid;grid-template-columns:1.2fr 1fr;gap:3rem;align-items:start}
+    .sdg-layout{display:grid;grid-template-columns:auto 1fr;gap:3rem;align-items:start}
+    .sdg-badge{margin:0;width:180px;height:180px}
+    .sdg-num{font-size:3.8rem}
+    .users-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:2.5rem;align-items:start}
+    .needs-grid{grid-template-columns:1fr 1fr}
+    .deck-container{flex-direction:row;align-items:flex-start}
+    .deck-wrapper{width:420px;height:360px}
+    .persona-deck{width:420px;height:360px}
+    .two-col{grid-template-columns:1fr 1fr}
+    .features-grid{grid-template-columns:repeat(3,1fr)}
+    .tools-grid{grid-template-columns:repeat(5,1fr)}
+    .testing-top{grid-template-columns:repeat(3,1fr)}
+    .impact-grid{grid-template-columns:repeat(3,1fr)}
+    .demo-layout{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+    .s-arr{display:flex;align-items:center}
+    .sitemap-flow{flex-wrap:nowrap}
+
+    /* Restore card padding */
+    .card{padding:1.6rem}
+    .feat{padding:1.8rem}
+    .impact-card{padding:2rem 1.6rem;text-align:center}
+    .impact-icon{margin:0 auto 1.2rem}
+    .closing{padding:2.5rem 3rem;text-align:center}
+
+    /* Card tilt on desktop */
+    .feat:hover,.impact-card:hover{transform:translateY(-8px)}
+  }
+
+  /* Touch device optimizations */
+  @media(hover:none){
+    .feat:hover,.impact-card:hover,.user-tag:hover,.pain-card:hover,
+    .obj:hover,.tool:hover,.mini-persona:hover,.demo-step:hover{
+      transform:none;
+    }
+  }
+  </style>
+</head>
+<body>
+
+<!-- BG -->
+<div id="org-bg">
+  <div class="org-blob ob1"></div>
+  <div class="org-blob ob2"></div>
+  <div class="org-blob ob3"></div>
+</div>
+<div class="topo-overlay"></div>
+
+<!-- PROGRESS -->
+<div id="progress"></div>
+
+<!-- NAV -->
+<nav id="topnav">
+  <div class="nav-logo">
+    <img src="assets/logos/ambag_plus_logo.png" alt="Ambag+" style="height:34px;" onerror="this.style.display='none'"/>
+    <span class="nav-logo-text">Am<span>bag</span>+</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#sdg">SDG</a></li>
+    <li><a href="#users">Users</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#testing">Testing</a></li>
+    <li><a href="#demo">Demo</a></li>
+  </ul>
+  <span class="nav-tag">INF242</span>
+  <!-- Hamburger (mobile only) -->
+  <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile Menu Drawer -->
+<div class="mobile-menu" id="mobileMenu">
+  <ul>
+    <li><a href="#problem" onclick="closeMobileMenu()">Problem</a></li>
+    <li><a href="#sdg" onclick="closeMobileMenu()">SDG Alignment</a></li>
+    <li><a href="#users" onclick="closeMobileMenu()">Target Users</a></li>
+    <li><a href="#features" onclick="closeMobileMenu()">Features</a></li>
+    <li><a href="#testing" onclick="closeMobileMenu()">Testing</a></li>
+    <li><a href="#demo" onclick="closeMobileMenu()">Demo</a></li>
+  </ul>
+</div>
+
+<!-- SDG FLOAT -->
+<div id="sdg-float" onclick="document.getElementById('sdg').scrollIntoView({behavior:'smooth'})">
+  <span>17</span><small>SDGs</small>
+</div>
+
+<!-- ① COVER -->
+<section id="cover" class="section">
+  <div class="cover-inner">
+    <div class="cover-eyebrow reveal">
+      <div class="live-dot"></div>
+      <span style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--moss)">CTWBDEVL — Web Systems and Technologies</span>
+    </div>
+    <img class="cover-logo-big reveal d1" src="assets/images/ambag_solo_logo.png" alt="Ambag+" onerror="this.style.display='none'"/>
+    <h1 class="cover-title reveal d1">Am<em style="font-style:normal;color:var(--moss)">bag</em><span class="plus">+</span></h1>
+    <p class="cover-tagline reveal d2">One Mission. One Platform. <em>Real Impact.</em></p>
+    <div class="cover-meta reveal d3">
+      <div class="cover-meta-cell">
+        <div class="lbl">Course</div>
+        <strong>CTWBDEVL · INF242</strong>
+      </div>
+      <div class="cover-meta-cell">
+        <div class="lbl">Submitted To</div>
+        <strong>Prof. John Clement S. Escobanez, MSIT</strong>
+      </div>
+      <div class="cover-meta-cell">
+        <div class="lbl">Date</div>
+        <strong>June 2, 2026</strong>
+      </div>
+    </div>
+    <div class="cover-members reveal d4">
+      <div class="member-chip"><i data-lucide="user" style="width:11px;height:11px"></i> Yhvhan Suba</div>
+      <div class="member-chip"><i data-lucide="user" style="width:11px;height:11px"></i> Jessieca Mae Milan</div>
+      <div class="member-chip"><i data-lucide="user" style="width:11px;height:11px"></i> Wilhelm Bruce H. Cuevas</div>
+    </div>
+    <div class="scroll-hint reveal d5"><div class="scroll-line"></div> Scroll to explore</div>
+  </div>
+</section>
+
+<!-- ② ROADMAP -->
+<section id="roadmap" class="section">
+  <div class="section-num reveal">Overview</div>
+  <h2 class="section-title reveal d1">Presentation <em>Roadmap</em></h2>
+  <div class="roadmap-track reveal d2">
+    <div class="r-step"><div class="r-node">01</div><h3>Problem &amp; SDG Alignment</h3></div>
+    <div class="r-arrow">——</div>
+    <div class="r-step"><div class="r-node">02</div><h3>Users, Objectives &amp; Overview</h3></div>
+    <div class="r-arrow">——</div>
+    <div class="r-step"><div class="r-node">03</div><h3>Structure, Features &amp; Design</h3></div>
+    <div class="r-arrow">——</div>
+    <div class="r-step"><div class="r-node">04</div><h3>Testing, Improvements &amp; Challenges</h3></div>
+    <div class="r-arrow">——</div>
+    <div class="r-step"><div class="r-node">05</div><h3>System Demonstration</h3></div>
+  </div>
+</section>
+
+<!-- ③ PROBLEM -->
+<section id="problem" class="section">
+  <div class="section-num reveal">§ 01</div>
+  <h2 class="section-title reveal d1">The <em>Problem</em></h2>
+  <div class="problem-layout">
+    <div>
+      <div class="problem-statement reveal d2">
+        <p>Many people care about social and environmental issues but struggle to find a clear way to get involved and stay consistent. Without the right support or platform, good intentions can easily fade — causing opportunities to address challenges like poverty, climate change, and inequality to be missed. A dedicated platform can bring people, organizations, and advocacy groups together in one space, making it easier to connect, collaborate, and create meaningful impact.</p>
+      </div>
+      <div class="ev-grid reveal d3">
+        <div class="ev-card"><i data-lucide="trending-down"></i><span class="ev-lbl">Poverty</span><span class="ev-desc">Hundreds of millions still live in extreme poverty worldwide</span></div>
+        <div class="ev-card"><i data-lucide="cloud-rain"></i><span class="ev-lbl">Climate</span><span class="ev-desc">Floods, droughts &amp; wildfires intensify globally each year</span></div>
+        <div class="ev-card"><i data-lucide="wheat"></i><span class="ev-lbl">Hunger</span><span class="ev-desc">Millions face food insecurity &amp; malnutrition daily</span></div>
+        <div class="ev-card"><i data-lucide="book-open"></i><span class="ev-lbl">Education</span><span class="ev-desc">Many children still lack access to quality education</span></div>
+        <div class="ev-card"><i data-lucide="users"></i><span class="ev-lbl">Gender Equality</span><span class="ev-desc">Women underrepresented; wage gaps persist globally</span></div>
+        <div class="ev-card"><i data-lucide="droplets"></i><span class="ev-lbl">Clean Water</span><span class="ev-desc">Billions face water scarcity for parts of the year</span></div>
+      </div>
+    </div>
+    <div class="reveal-r">
+      <div class="pain-card">
+        <div class="pain-icon"><i data-lucide="users"></i></div>
+        <div><div class="pain-lbl">Affected Users</div><p style="font-size:.82rem;color:var(--ink);opacity:.8">People of all ages directly or indirectly affected by global social, economic, and environmental challenges.</p></div>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon"><i data-lucide="alert-triangle"></i></div>
+        <div><div class="pain-lbl">Core Pain Point</div><p style="font-size:.82rem;color:var(--ink);opacity:.8">Many care about making a difference but lack awareness, accessible resources, or opportunities to contribute to the 17 SDGs.</p></div>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon"><i data-lucide="flame"></i></div>
+        <div><div class="pain-lbl">Impact if Unaddressed</div><p style="font-size:.82rem;color:var(--ink);opacity:.8">Without greater public engagement, efforts to achieve the SDGs are slowed, allowing global challenges to persist and affect communities.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ④ SDG -->
+<section id="sdg" class="section">
+  <div class="section-num reveal">§ 01 cont.</div>
+  <h2 class="section-title reveal d1">SDG <em>Alignment</em></h2>
+  <div class="sdg-layout reveal d2">
+    <div class="sdg-badge">
+      <div class="sdg-inner">
+        <div class="sdg-num">17</div>
+        <div class="sdg-sub">All SDGs</div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:.9rem">
+        <div class="card-label">Alignment Explanation</div>
+        <p style="font-size:.86rem;line-height:1.78;color:var(--ink);opacity:.85">Ambag+ is aligned with all 17 Sustainable Development Goals by providing a centralized platform that increases awareness, encourages participation, and connects individuals, organizations, and communities with opportunities to contribute to sustainable development. Rather than addressing a single issue, Ambag+ empowers users to learn about, engage with, and support causes related to all SDGs — fostering collective action toward social, economic, and environmental progress.</p>
+      </div>
+      <div class="sdg-matrix">
+        <div class="sdg-cell"><div class="cell-lbl">Problem</div><p>Lack of awareness &amp; contributions toward achieving all 17 SDGs</p></div>
+        <div class="sdg-cell"><div class="cell-lbl">Website Feature</div><p>Centralized community — only SDG-related content approved</p></div>
+        <div class="sdg-cell"><div class="cell-lbl">User Benefit</div><p>A platform where even the smallest contribution is celebrated</p></div>
+        <div class="sdg-cell"><div class="cell-lbl">SDG Contribution</div><p>Bringing light and action to all 17 SDGs simultaneously</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑤ TARGET USERS -->
+<section id="users" class="section">
+  <div class="section-num reveal">§ 02</div>
+  <h2 class="section-title reveal d1">Target <em>Users</em> &amp; User Needs</h2>
+  <div class="users-grid">
+    <div class="reveal-l">
+      <div class="card-label" style="margin-bottom:.7rem">Primary Users</div>
+      <div class="user-tag"><div class="user-tag-ico"><i data-lucide="graduation-cap"></i></div><span class="user-tag-name">University Students</span></div>
+      <div class="user-tag"><div class="user-tag-ico"><i data-lucide="flag"></i></div><span class="user-tag-name">Advocacy Groups &amp; Organizations</span></div>
+      <div class="user-tag"><div class="user-tag-ico"><i data-lucide="users"></i></div><span class="user-tag-name">Community Extension Groups</span></div>
+      <div class="user-tag"><div class="user-tag-ico"><i data-lucide="user"></i></div><span class="user-tag-name">Everyday Individuals</span></div>
+      <div class="needs-grid">
+        <div class="needs-card">
+          <div class="card-label">User Needs</div>
+          <div class="list-item"><i data-lucide="circle-dot" style="color:var(--ember)"></i><span>Limited awareness of the 17 SDGs and everyday life relevance</span></div>
+          <div class="list-item"><i data-lucide="circle-dot" style="color:var(--ember)"></i><span>Difficulty finding advocacy campaign opportunities</span></div>
+          <div class="list-item"><i data-lucide="circle-dot" style="color:var(--ember)"></i><span>No centralized platform for SDG-related projects</span></div>
+        </div>
+        <div class="needs-card">
+          <div class="card-label">How We Help</div>
+          <div class="list-item"><i data-lucide="check-circle" style="color:var(--lime)"></i><span>Accessible educational content for all 17 SDGs</span></div>
+          <div class="list-item"><i data-lucide="check-circle" style="color:var(--lime)"></i><span>Connects users with aligned advocacy groups</span></div>
+          <div class="list-item"><i data-lucide="check-circle" style="color:var(--lime)"></i><span>Gamification drives continuous participation</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card reveal-r" style="height:fit-content">
+      <div class="card-label">Value to Each User Type</div>
+      <div style="display:flex;flex-direction:column;gap:.55rem">
+        <div style="padding:.8rem 1rem;background:rgba(93,184,112,.06);border:1px solid rgba(93,184,112,.15);border-radius:var(--r-sm)"><div style="font-family:var(--font-display);font-weight:700;font-size:.85rem;color:var(--forest);margin-bottom:.2rem">Students</div><p style="font-size:.79rem;color:var(--muted)">Learn about SDGs through interactive content and earn contribution points.</p></div>
+        <div style="padding:.8rem 1rem;background:rgba(200,150,42,.06);border:1px solid rgba(200,150,42,.15);border-radius:var(--r-sm)"><div style="font-family:var(--font-display);font-weight:700;font-size:.85rem;color:var(--forest);margin-bottom:.2rem">Advocacy Groups</div><p style="font-size:.79rem;color:var(--muted)">Promote campaigns and reach a targeted, engaged audience.</p></div>
+        <div style="padding:.8rem 1rem;background:rgba(93,184,112,.06);border:1px solid rgba(93,184,112,.15);border-radius:var(--r-sm)"><div style="font-family:var(--font-display);font-weight:700;font-size:.85rem;color:var(--forest);margin-bottom:.2rem">Community Groups</div><p style="font-size:.79rem;color:var(--muted)">Coordinate initiatives and collaborate with like-minded communities.</p></div>
+        <div style="padding:.8rem 1rem;background:rgba(200,150,42,.06);border:1px solid rgba(200,150,42,.15);border-radius:var(--r-sm)"><div style="font-family:var(--font-display);font-weight:700;font-size:.85rem;color:var(--forest);margin-bottom:.2rem">Everyday Individuals</div><p style="font-size:.79rem;color:var(--muted)">Start contributing with simple actions and track your impact.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PERSONA DECK -->
+  <div class="personas-section reveal">
+    <div class="personas-label">Community Voices — User Personas</div>
+    <div class="deck-container">
+      <!-- MAIN DECK -->
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div class="deck-wrapper">
+          <div class="persona-deck" id="personaDeck">
+            <!-- Card 0 -->
+            <div class="p-card is-top" data-index="0">
+              <div class="p-card-header">
+                <div class="p-avatar"><img src="assets/images/evan_img.jpg" alt="Evan Dizon" onerror="this.parentNode.innerHTML='<div class=\'p-avatar-placeholder\'><i data-lucide=\'user\'></i></div>';lucide.createIcons()"/></div>
+                <div>
+                  <div class="p-name">Evan Dizon</div>
+                  <div class="p-role">University Student</div>
+                  <div class="p-stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+                </div>
+              </div>
+              <p class="p-quote">"Ambag+ finally gave me a place to actually learn about the SDGs in a way that feels relevant to my life."</p>
+              <span class="p-goal">Goal: Better SDG Awareness</span>
+              <p class="p-pain">No engaging community platform — solved by Ambag+'s centralized hub.</p>
+            </div>
+            <!-- Card 1 -->
+            <div class="p-card is-2nd" data-index="1">
+              <div class="p-card-header">
+                <div class="p-avatar"><img src="assets/images/benedict_img.jpg" alt="Benedict Pascua" onerror="this.parentNode.innerHTML='<div class=\'p-avatar-placeholder\'><i data-lucide=\'user\'></i></div>';lucide.createIcons()"/></div>
+                <div>
+                  <div class="p-name">Benedict Pascua</div>
+                  <div class="p-role">University Student</div>
+                  <div class="p-stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24" style="opacity:.3"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+                </div>
+              </div>
+              <p class="p-quote">"I didn't know where to start with SDG advocacy until Ambag+ brought everything into one place."</p>
+              <span class="p-goal">Goal: SDG Entry Point</span>
+              <p class="p-pain">No engaging community platform — provided by Ambag+'s centralized community.</p>
+            </div>
+            <!-- Card 2 -->
+            <div class="p-card is-3rd" data-index="2">
+              <div class="p-card-header">
+                <div class="p-avatar"><img src="assets/images/lloyd_img.jpg" alt="Dan Lloyd Mamaril" onerror="this.parentNode.innerHTML='<div class=\'p-avatar-placeholder\'><i data-lucide=\'user\'></i></div>';lucide.createIcons()"/></div>
+                <div>
+                  <div class="p-name">Dan Lloyd Mamaril</div>
+                  <div class="p-role">Everyday Individual</div>
+                  <div class="p-stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+                </div>
+              </div>
+              <p class="p-quote">"The gamified point system makes contributing genuinely fun. Every post feels like progress."</p>
+              <span class="p-goal">Goal: Contribute &amp; Have Fun</span>
+              <p class="p-pain">Most SDG sites are static — Ambag+'s gamified points change that.</p>
+            </div>
+            <!-- Card 3 -->
+            <div class="p-card is-hidden" data-index="3">
+              <div class="p-card-header">
+                <div class="p-avatar"><img src="assets/images/jose_img.jpg" alt="Jose Gabriel Delacruz" onerror="this.parentNode.innerHTML='<div class=\'p-avatar-placeholder\'><i data-lucide=\'user\'></i></div>';lucide.createIcons()"/></div>
+                <div>
+                  <div class="p-name">Jose Gabriel Delacruz</div>
+                  <div class="p-role">Community Member</div>
+                  <div class="p-stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24" style="opacity:.3"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+                </div>
+              </div>
+              <p class="p-quote">"Finally an active community! Everyone posts to earn points so the feed is always fresh and engaging."</p>
+              <span class="p-goal">Goal: Socialize &amp; Connect</span>
+              <p class="p-pain">Community groups are inactive — Ambag+'s contribution system drives daily activity.</p>
+            </div>
+            <!-- Card 4 -->
+            <div class="p-card is-hidden" data-index="4">
+              <div class="p-card-header">
+                <div class="p-avatar"><div class="p-avatar-placeholder"><i data-lucide="user"></i></div></div>
+                <div>
+                  <div class="p-name">Henrick Espiritu</div>
+                  <div class="p-role">Volunteer</div>
+                  <div class="p-stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+                </div>
+              </div>
+              <p class="p-quote">"Volunteer opportunities used to be scattered everywhere. Ambag+ is the single hub I never knew I needed."</p>
+              <span class="p-goal">Goal: Find Volunteer Opportunities</span>
+              <p class="p-pain">Centralized hub for campaigns &amp; events solves scattered information.</p>
+            </div>
+          </div>
+        </div>
+        <div class="deck-hint"><i data-lucide="mouse-pointer-click"></i> Tap the card to cycle</div>
+        <div class="deck-counter" id="deckCounter">
+          <div class="deck-dot active" onclick="jumpTo(0)"></div>
+          <div class="deck-dot" onclick="jumpTo(1)"></div>
+          <div class="deck-dot" onclick="jumpTo(2)"></div>
+          <div class="deck-dot" onclick="jumpTo(3)"></div>
+          <div class="deck-dot" onclick="jumpTo(4)"></div>
+        </div>
+      </div>
+
+      <!-- Mini personas -->
+      <div style="flex:1;min-width:0">
+        <div class="card-label" style="margin-bottom:.8rem">More Community Voices</div>
+        <div class="deck-row-2">
+          <div class="mini-persona"><div class="mini-av"><i data-lucide="user"></i></div><div><div class="mini-name">Johnray Raz</div><div class="mini-role">News Follower</div><div class="mini-quote">"SDG news used to overwhelm me. Ambag+ curates what actually matters."</div><div class="mini-goal">Goal: Stay Updated</div></div></div>
+          <div class="mini-persona"><div class="mini-av"><i data-lucide="user"></i></div><div><div class="mini-name">Raj Rodelio Antido</div><div class="mini-role">Advocacy Creator</div><div class="mini-quote">"My advocacy posts finally reach people who genuinely care about the cause."</div><div class="mini-goal">Goal: Share Ideas Widely</div></div></div>
+          <div class="mini-persona"><div class="mini-av"><i data-lucide="user"></i></div><div><div class="mini-name">Lawrence Asis</div><div class="mini-role">Project Collaborator</div><div class="mini-quote">"Found my project partner in two days. The community filter is a game changer."</div><div class="mini-goal">Goal: Collaborate</div></div></div>
+          <div class="mini-persona"><div class="mini-av"><i data-lucide="user"></i></div><div><div class="mini-name">Basty Baldivia</div><div class="mini-role">Impact Tracker</div><div class="mini-quote">"The achievement system shows me exactly how much I've contributed."</div><div class="mini-goal">Goal: Track Contributions</div></div></div>
+          <div class="mini-persona"><div class="mini-av"><i data-lucide="user"></i></div><div><div class="mini-name">Karl Imerson</div><div class="mini-role">Lifelong Learner</div><div class="mini-quote">"Bite-sized SDG content is exactly what I needed. Learning never felt this approachable."</div><div class="mini-goal">Goal: Learn &amp; Grow</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑥ OBJECTIVES -->
+<section id="objectives" class="section">
+  <div class="section-num reveal">§ 02 cont.</div>
+  <h2 class="section-title reveal d1">Website <em>Objectives</em></h2>
+  <div class="obj-list">
+    <div class="obj reveal d1"><div class="obj-num">01</div><p>Promote a culture of contribution and engagement through leaderboards, rewards, and social sharing.</p></div>
+    <div class="obj reveal d2"><div class="obj-num">02</div><p>Allow users to complete SDG-related tasks, submit proof of participation, and receive contribution points toward individual and institutional rankings.</p></div>
+    <div class="obj reveal d3"><div class="obj-num">03</div><p>Scale from a local university setting to widespread national and worldwide use.</p></div>
+    <div class="obj reveal d4"><div class="obj-num">04</div><p>Increase awareness and understanding of all 17 SDGs by providing accessible educational content, advocacy campaigns, and community-driven discussions.</p></div>
+    <div class="obj reveal d5"><div class="obj-num">05</div><p>Foster collaboration among students, organizations, and communities by creating a centralized platform where users can share initiatives, promote events, and work together.</p></div>
+  </div>
+</section>
+
+<!-- ⑦ OVERVIEW -->
+<section id="overview" class="section">
+  <div class="section-num reveal">§ 02 cont.</div>
+  <h2 class="section-title reveal d1">Website <em>Overview</em></h2>
+  <div class="pitch-block reveal d2">
+    <blockquote>With Ambag+, we're not just solving problems — we're building a community. One Mission, One Platform, Real Impact.</blockquote>
+  </div>
+  <div class="two-col reveal d3">
+    <div class="card">
+      <div class="card-label">Website Description</div>
+      <p style="font-size:.86rem;line-height:1.78;color:var(--ink);opacity:.85">Ambag+ is a scalable digital platform designed to increase citizen participation in the United Nations SDGs through simple, everyday actions. The system transforms small individual contributions into measurable, collective impact by integrating social interaction, gamification, and community-based competition.</p>
+    </div>
+    <div class="card">
+      <div class="card-label">Value Proposition</div>
+      <p style="font-size:.86rem;line-height:1.78;color:var(--ink);opacity:.85">For students, advocacy groups, organizations, and socially conscious individuals, Ambag+ provides an engaging way to contribute to the SDGs by offering a centralized platform for completing SDG-related activities, connecting with communities, tracking impact, and earning rewards through gamified participation.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ⑧ SITE MAP -->
+<section id="sitemap" class="section">
+  <div class="section-num reveal">§ 03</div>
+  <h2 class="section-title reveal d1">Website <em>Structure</em></h2>
+  <div class="sitemap-flow reveal d2">
+    <div class="s-box active">Home</div>
+    <div class="s-arr"></div>
+    <div class="s-box">How to Use</div>
+    <div class="s-arr"></div>
+    <div class="s-box">Features</div>
+    <div class="s-arr"></div>
+    <div class="s-box">Feed / Posts</div>
+    <div class="s-arr"></div>
+    <div class="s-box">Meet the Team</div>
+  </div>
+  <div class="card reveal d3">
+    <div class="map-table-wrap">
+      <table class="map-table">
+        <thead><tr><th>Page Name</th><th>Purpose</th><th>Main Content</th></tr></thead>
+        <tbody>
+          <tr><td>Landing Page</td><td>Welcome and greet users upon landing</td><td>Welcome message, How to Use, Intro to the 17 SDGs, Meet the Team</td></tr>
+          <tr><td>Feed Page</td><td>Contains all user-generated content</td><td>Contribution posts, trending stories, community challenges</td></tr>
+          <tr><td>Interest Page</td><td>Onboarding assessment to get user interests</td><td>Questions to collect user info and SDG preferences</td></tr>
+          <tr><td>Posts Page</td><td>Single container for post templates</td><td>Invisible container embedded in the feed page</td></tr>
+          <tr><td>Super Admin Page</td><td>Monitoring and statistics dashboard</td><td>Contribution points across all students and NU campuses</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ⑨ FEATURES -->
+<section id="features" class="section">
+  <div class="section-num reveal">§ 03 cont.</div>
+  <h2 class="section-title reveal d1">Key <em>Features</em></h2>
+  <div class="features-grid">
+    <div class="feat reveal d1"><div class="feat-icon"><i data-lucide="trophy"></i></div><h3>Gamified Reward System</h3><p>Rewards users with Contribution Points upon posting and interacting on the platform.</p><div class="feat-benefit"><div class="feat-benefit-lbl">User Benefit</div><p>Sustained engagement and motivation to keep contributing to SDG causes.</p></div></div>
+    <div class="feat reveal d2"><div class="feat-icon"><i data-lucide="shield-check"></i></div><h3>AI Content Moderation</h3><p>Powered by Anthropic Claude Haiku 4.5 — checks posts for profanities, hate speech, and SDG relevancy before publishing.</p><div class="feat-benefit"><div class="feat-benefit-lbl">User Benefit</div><p>A safe, focused, and trustworthy community space for advocacy.</p></div></div>
+    <div class="feat reveal d3"><div class="feat-icon"><i data-lucide="activity"></i></div><h3>AI User Behavior Analysis</h3><p>Monitors interactions and flags users for review or future banning if patterns indicate harmful behavior.</p><div class="feat-benefit"><div class="feat-benefit-lbl">User Benefit</div><p>Automated enforcement keeps the platform healthy and respectful.</p></div></div>
+    <div class="feat reveal d4"><div class="feat-icon"><i data-lucide="flame"></i></div><h3>Streak System</h3><p>Daily contributions maintain and level up the user's streak, encouraging consistent participation.</p><div class="feat-benefit"><div class="feat-benefit-lbl">User Benefit</div><p>Builds a daily habit of advocacy and sustainable engagement.</p></div></div>
+    <div class="feat reveal d5"><div class="feat-icon"><i data-lucide="award"></i></div><h3>Badges &amp; Perks System</h3><p>Users earn various badges and unlock perks as they accumulate more Contribution Points.</p><div class="feat-benefit"><div class="feat-benefit-lbl">User Benefit</div><p>Recognition and rewards that make contribution feel meaningful.</p></div></div>
+    <div class="feat reveal d6"><div class="feat-icon"><i data-lucide="sparkles"></i></div><h3>AI Topic Suggestions</h3><p>AI suggests and auto-writes topics based on trending SDG discussions, reducing friction for new users.</p><div class="feat-benefit"><div class="feat-benefit-lbl">User Benefit</div><p>Anyone can post meaningful content — even without knowing where to start.</p></div></div>
+  </div>
+  <div class="feat-extra reveal">
+    <div class="feat-icon" style="margin-bottom:0;flex-shrink:0"><i data-lucide="swords"></i></div>
+    <div>
+      <div class="feat-benefit-lbl" style="margin-bottom:.35rem">Bonus Feature — Campus Challenge System</div>
+      <p style="font-size:.84rem;color:var(--ink);opacity:.8">Students from different National University branches compete in global challenges to earn the most Contribution Points, fostering inter-campus collaboration and healthy competition in SDG advocacy.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ⑩ DESIGN -->
+<section id="design" class="section">
+  <div class="section-num reveal">§ 03 cont.</div>
+  <h2 class="section-title reveal d1">Design &amp; <em>UX Decisions</em></h2>
+  <div class="card reveal d2">
+    <div class="design-table-wrap">
+      <table class="design-table">
+        <thead><tr><th>Design Element</th><th>Decision</th><th>Reason</th></tr></thead>
+        <tbody>
+          <tr><td>Color Palette</td><td>Green + Black · Green + White · Purple + Neon · Gold + Blue</td><td>Multiple palettes matching the site's core colors to cater to diverse users and moods.</td></tr>
+          <tr><td>Typography</td><td>Batangas Bold 700 (headings) &amp; Inter (body)</td><td>Strong display font for emphasis paired with a readable body font for clarity.</td></tr>
+          <tr><td>Layout</td><td>Facebook-like navigation layout</td><td>Familiar social media layout that most users are already comfortable navigating.</td></tr>
+          <tr><td>Navigation</td><td>Sidebar — Content — Sidebar hierarchy</td><td>Easy access to different pages with the main content area centered for visual emphasis.</td></tr>
+          <tr><td>Spacing / Hierarchy</td><td>Content-centered with generous sidebar spacing</td><td>Focuses user attention on the feed and posts while keeping navigation accessible.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ⑪ TOOLS -->
+<section id="tools" class="section">
+  <div class="section-num reveal">§ 03 cont.</div>
+  <h2 class="section-title reveal d1">Tools &amp; <em>Technologies</em></h2>
+  <div class="tools-grid">
+    <div class="tool reveal d1"><div class="tool-ico"><i data-lucide="layers"></i></div><div class="tool-name">React JS</div><div class="tool-desc">Component &amp; state UI</div></div>
+    <div class="tool reveal d2"><div class="tool-ico"><i data-lucide="zap"></i></div><div class="tool-name">Next JS</div><div class="tool-desc">Multi-page, SEO &amp; SSR</div></div>
+    <div class="tool reveal d3"><div class="tool-ico"><i data-lucide="server"></i></div><div class="tool-name">Node JS</div><div class="tool-desc">Core backend &amp; NPM</div></div>
+    <div class="tool reveal d4"><div class="tool-ico"><i data-lucide="wind"></i></div><div class="tool-name">Tailwind CSS</div><div class="tool-desc">Organized styling</div></div>
+    <div class="tool reveal d5"><div class="tool-ico"><i data-lucide="cloud"></i></div><div class="tool-name">Cloudinary</div><div class="tool-desc">Media object storage</div></div>
+    <div class="tool reveal d1"><div class="tool-ico"><i data-lucide="database"></i></div><div class="tool-name">Firebase</div><div class="tool-desc">Auth &amp; NoSQL database</div></div>
+    <div class="tool reveal d2"><div class="tool-ico"><i data-lucide="cpu"></i></div><div class="tool-name">Redis</div><div class="tool-desc">Cache for queries</div></div>
+    <div class="tool reveal d3"><div class="tool-ico"><i data-lucide="bot"></i></div><div class="tool-name">Anthropic Haiku</div><div class="tool-desc">AI moderation &amp; topics</div></div>
+    <div class="tool reveal d4"><div class="tool-ico"><i data-lucide="upload-cloud"></i></div><div class="tool-name">Vercel</div><div class="tool-desc">Deployment platform</div></div>
+    <div class="tool reveal d5"><div class="tool-ico"><i data-lucide="git-branch"></i></div><div class="tool-name">GitHub</div><div class="tool-desc">Version control</div></div>
+  </div>
+  <div class="repo-strip reveal">
+    <i data-lucide="github"></i>
+    <span style="font-family:var(--font-mono);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--moss)">Repository</span>
+    <a href="https://github.com/ItzEvhyx/AmbagPlus" target="_blank">github.com/ItzEvhyx/AmbagPlus</a>
+  </div>
+</section>
+
+<!-- ⑫ TESTING -->
+<section id="testing" class="section">
+  <div class="section-num reveal">§ 04</div>
+  <h2 class="section-title reveal d1">Testing &amp; <em>Improvements</em></h2>
+  <div class="testing-top">
+    <div class="card reveal d2">
+      <div class="card-label">Testing Conducted</div>
+      <div class="list-item"><i data-lucide="check" style="color:var(--lime);min-width:14px;height:14px"></i><span>AI-powered content moderation validation</span></div>
+      <div class="list-item"><i data-lucide="check" style="color:var(--lime);min-width:14px;height:14px"></i><span>Website responsiveness across different screen sizes</span></div>
+      <div class="list-item"><i data-lucide="check" style="color:var(--lime);min-width:14px;height:14px"></i><span>Module functionality via class-wide live demonstration</span></div>
+    </div>
+    <div class="card reveal d3">
+      <div class="card-label">Improvements Made</div>
+      <div class="list-item"><i data-lucide="wrench" style="color:var(--gold);min-width:14px;height:14px"></i><span>AI Content Moderation prompt fine-tuning for better accuracy</span></div>
+      <div class="list-item"><i data-lucide="wrench" style="color:var(--gold);min-width:14px;height:14px"></i><span>Migrated from Outlook Auth to both Outlook and Gmail authentication</span></div>
+    </div>
+    <div class="card reveal d4">
+      <div class="card-label">Feedback Received</div>
+      <p style="font-size:.83rem;color:var(--ink);opacity:.8">Feedback gathered through class-wide demonstration — module functionality and UI responsiveness were the primary areas evaluated.</p>
+    </div>
+  </div>
+  <div class="card reveal d5">
+    <div class="testing-table-wrap">
+      <table class="testing-table">
+        <thead><tr><th>Issue Found</th><th>Improvement Made</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td>AI moderation producing inaccurate approvals / rejections</td><td>Fine-tuned the moderation prompt for improved SDG relevancy detection</td><td><span class="badge-fixed">Fixed</span></td></tr>
+          <tr><td>Authentication limited to Microsoft Outlook only</td><td>Migrated and expanded to support both Outlook and Gmail OAuth</td><td><span class="badge-fixed">Fixed</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ⑬ CHALLENGES -->
+<section id="challenges" class="section">
+  <div class="section-num reveal">§ 04 cont.</div>
+  <h2 class="section-title reveal d1">Challenges &amp; <em>Solutions</em></h2>
+  <div class="challenges-list">
+    <div class="chal reveal d1"><div class="chal-cell"><div class="cell-lbl">Challenge</div><p>Defining a unique value proposition among existing advocacy and social platforms.</p></div><div class="chal-cell"><div class="cell-lbl">How We Solved It</div><p>Researched similar platforms and focused on gamification, contribution tracking, and SDG engagement as key differentiators.</p></div><div class="chal-cell"><div class="cell-lbl">Lesson Learned</div><p>A clear and unique value proposition is essential before development begins.</p></div></div>
+    <div class="chal reveal d2"><div class="chal-cell"><div class="cell-lbl">Challenge</div><p>Designing a system that supports all 17 SDGs without making the platform overly complex.</p></div><div class="chal-cell"><div class="cell-lbl">How We Solved It</div><p>Created flexible categories, campaigns, and activities mappable to any SDG.</p></div><div class="chal-cell"><div class="cell-lbl">Lesson Learned</div><p>Scalability and flexibility should be built into system architecture from the start.</p></div></div>
+    <div class="chal reveal d3"><div class="chal-cell"><div class="cell-lbl">Challenge</div><p>Keeping users engaged beyond their initial sign-up.</p></div><div class="chal-cell"><div class="cell-lbl">How We Solved It</div><p>Implemented leaderboards, contribution points, achievements, and community interaction features.</p></div><div class="chal-cell"><div class="cell-lbl">Lesson Learned</div><p>User retention is just as important as user acquisition.</p></div></div>
+    <div class="chal reveal d4"><div class="chal-cell"><div class="cell-lbl">Challenge</div><p>Balancing feature richness with a clean and user-friendly interface.</p></div><div class="chal-cell"><div class="cell-lbl">How We Solved It</div><p>Prioritized core features and refined the UI through iterative design and feedback.</p></div><div class="chal-cell"><div class="cell-lbl">Lesson Learned</div><p>Simplicity improves usability and user adoption.</p></div></div>
+    <div class="chal reveal d5"><div class="chal-cell"><div class="cell-lbl">Challenge</div><p>Ensuring the platform could support future growth beyond a university setting.</p></div><div class="chal-cell"><div class="cell-lbl">How We Solved It</div><p>Designed the database and user management system with scalability in mind from the start.</p></div><div class="chal-cell"><div class="cell-lbl">Lesson Learned</div><p>Thinking about future expansion early reduces redevelopment costs later.</p></div></div>
+  </div>
+</section>
+
+<!-- ⑭ IMPACT -->
+<section id="impact" class="section">
+  <div class="section-num reveal">Closing</div>
+  <h2 class="section-title reveal d1">Impact <em>Statement</em></h2>
+  <div class="impact-grid">
+    <div class="impact-card reveal d2"><div class="impact-icon"><i data-lucide="building-2"></i></div><h3>Practical Impact</h3><p>Ambag+ enables students, organizations, and everyday individuals to take meaningful, consistent action on SDG-related issues through an engaging and accessible digital platform.</p></div>
+    <div class="impact-card reveal d3"><div class="impact-icon"><i data-lucide="leaf"></i></div><h3>SDG Contribution</h3><p>By centralizing awareness, participation, and advocacy for all 17 SDGs, Ambag+ amplifies collective action toward sustainable social, economic, and environmental progress.</p></div>
+    <div class="impact-card reveal d4"><div class="impact-icon"><i data-lucide="rocket"></i></div><h3>Future Potential</h3><p>Ambag+ is designed to scale from a university platform to a national and worldwide advocacy network — built for future expansion and deeper SDG integration.</p></div>
+  </div>
+  <div class="closing reveal d5">
+    <blockquote>Every contribution, no matter how small, has the power to create lasting impact. Ambag+ provides a platform where individuals can learn, connect, and work together toward a more sustainable and equitable future.</blockquote>
+  </div>
+</section>
+
+<!-- ⑮ DEMO -->
+<section id="demo" class="section">
+  <div class="section-num reveal">§ 05</div>
+  <h2 class="section-title reveal d1">System <em>Demonstration</em></h2>
+  <div class="demo-layout">
+    <div class="reveal-l">
+      <div class="card" style="margin-bottom:.9rem">
+        <div class="card-label">Live Demo Link</div>
+        <a href="https://github.com/ItzEvhyx/AmbagPlus" target="_blank" style="color:var(--forest);font-family:var(--font-mono);font-size:.8rem;font-weight:700;display:flex;align-items:center;gap:.4rem;word-break:break-all">
+          <i data-lucide="external-link" style="width:14px;height:14px;flex-shrink:0"></i> github.com/ItzEvhyx/AmbagPlus
+        </a>
+      </div>
+      <div class="card" style="margin-bottom:.9rem">
+        <div class="card-label">Demo Presenters</div>
+        <p style="font-size:.86rem;color:var(--ink)">Yhvhan Suba · Jessieca Mae Milan · Wilhelm Bruce H. Cuevas</p>
+      </div>
+      <div class="card">
+        <div class="card-label" style="margin-bottom:.7rem">Demonstration Checklist</div>
+        <ul class="checklist" id="checklist">
+          <li onclick="toggleCheck(this)"><span class="chk"></span> Homepage &amp; landing page ready</li>
+          <li onclick="toggleCheck(this)"><span class="chk"></span> Navigation and sidebar ready</li>
+          <li onclick="toggleCheck(this)"><span class="chk"></span> Feed, posts, and interest pages ready</li>
+          <li onclick="toggleCheck(this)"><span class="chk"></span> AI moderation &amp; gamification features ready</li>
+          <li onclick="toggleCheck(this)"><span class="chk"></span> GitHub repository ready</li>
+        </ul>
+      </div>
+    </div>
+    <div class="reveal-r">
+      <div class="card">
+        <div class="card-label" style="margin-bottom:.8rem">Demonstration Flow</div>
+        <div class="demo-step"><div class="step-num">1</div><div><strong style="font-size:.86rem;color:var(--forest)">Open Landing Page</strong><p style="font-size:.79rem;color:var(--muted);margin-top:.12rem">Welcome screen — first impressions, site purpose, and SDG intro</p></div></div>
+        <div class="demo-step"><div class="step-num">2</div><div><strong style="font-size:.86rem;color:var(--forest)">Onboarding &amp; Interest Page</strong><p style="font-size:.79rem;color:var(--muted);margin-top:.12rem">Walk through the interest assessment that personalizes the user experience</p></div></div>
+        <div class="demo-step"><div class="step-num">3</div><div><strong style="font-size:.86rem;color:var(--forest)">Explore the Feed</strong><p style="font-size:.79rem;color:var(--muted);margin-top:.12rem">Show community posts, contribution feed, and trending content</p></div></div>
+        <div class="demo-step"><div class="step-num">4</div><div><strong style="font-size:.86rem;color:var(--forest)">Demo Key Features</strong><p style="font-size:.79rem;color:var(--muted);margin-top:.12rem">AI moderation, streak system, badges, leaderboard, and topic suggestions</p></div></div>
+        <div class="demo-step"><div class="step-num">5</div><div><strong style="font-size:.86rem;color:var(--forest)">Conclude &amp; SDG Connection</strong><p style="font-size:.79rem;color:var(--muted);margin-top:.12rem">Show how the platform maps to all 17 SDGs and scales to national use</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">
+    <img src="assets/images/ambag_solo_logo.png" alt="Ambag+" onerror="this.style.display='none'"/>
+    <span>Ambag+</span>
+  </div>
+  <p>Web for Impact · CTWBDEVL · INF242 · National University — CCIT · Team Collective</p>
+  <p style="color:var(--moss);opacity:.5;font-family:var(--font-mono);font-size:.58rem">June 2026</p>
+</footer>
+
+<script>
+/* ─── HAMBURGER MENU ─── */
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+
+hamburger.addEventListener('click', () => {
+  const isOpen = mobileMenu.classList.toggle('open');
+  hamburger.classList.toggle('open', isOpen);
+});
+
+function closeMobileMenu() {
+  mobileMenu.classList.remove('open');
+  hamburger.classList.remove('open');
+}
+
+// Close on outside click
+document.addEventListener('click', e => {
+  if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+    closeMobileMenu();
+  }
+});
+
+/* ─── PARALLAX ORBS — only on non-touch devices ─── */
+const ob1 = document.querySelector('.ob1');
+const ob2 = document.querySelector('.ob2');
+const ob3 = document.querySelector('.ob3');
+if (window.matchMedia('(hover:hover)').matches) {
+  document.addEventListener('mousemove', e => {
+    const dx = (e.clientX / window.innerWidth - .5);
+    const dy = (e.clientY / window.innerHeight - .5);
+    ob1.style.transform = `translate(${dx*-20}px,${dy*-14}px)`;
+    ob2.style.transform = `translate(${dx*18}px,${dy*18}px)`;
+    ob3.style.transform = `translate(${dx*14}px,${dy*-12}px)`;
+  });
+}
+
+/* ─── PROGRESS ─── */
+const prog = document.getElementById('progress');
+window.addEventListener('scroll', () => {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  prog.style.width = ((window.scrollY / max) * 100) + '%';
+}, { passive: true });
+
+/* ─── REVEAL ─── */
+const ro = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); ro.unobserve(e.target); }
+  });
+}, { threshold: 0.06, rootMargin: '0px 0px -30px 0px' });
+document.querySelectorAll('.reveal,.reveal-l,.reveal-r').forEach(el => ro.observe(el));
+
+/* ─── ACTIVE NAV ─── */
+const secs = document.querySelectorAll('section[id]');
+const navAs = document.querySelectorAll('.nav-links a');
+secs.forEach(s => new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navAs.forEach(a => a.classList.remove('active'));
+      const t = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
+      if (t) t.classList.add('active');
+    }
+  });
+}, { threshold: 0.4 }).observe(s));
+
+/* ─── PERSONA DECK ─── */
+let currentTop = 0;
+const cards = [...document.querySelectorAll('.p-card')];
+const dots = [...document.querySelectorAll('.deck-dot')];
+
+function applyStates() {
+  const n = cards.length;
+  cards.forEach((c, i) => {
+    c.classList.remove('is-top', 'is-2nd', 'is-3rd', 'is-hidden');
+    const rel = (i - currentTop + n) % n;
+    if (rel === 0) c.classList.add('is-top');
+    else if (rel === 1) c.classList.add('is-2nd');
+    else if (rel === 2) c.classList.add('is-3rd');
+    else c.classList.add('is-hidden');
+  });
+  dots.forEach((d, i) => d.classList.toggle('active', i === currentTop));
+}
+
+function cycleTop() {
+  const topCard = cards[currentTop];
+  topCard.classList.add('flying');
+  setTimeout(() => {
+    topCard.classList.remove('flying');
+    currentTop = (currentTop + 1) % cards.length;
+    applyStates();
+  }, 380);
+}
+
+document.getElementById('personaDeck').addEventListener('click', e => {
+  const topCard = cards[currentTop];
+  if (topCard.contains(e.target) || e.target === topCard) cycleTop();
+});
+
+function jumpTo(idx) { currentTop = idx; applyStates(); }
+
+/* ─── CHECKLIST ─── */
+function toggleCheck(li) {
+  const chk = li.querySelector('.chk');
+  const checked = chk.classList.toggle('checked');
+  if (checked) {
+    chk.innerHTML = '<i data-lucide="check" style="width:11px;height:11px"></i>';
+    lucide.createIcons({ nodes: [chk] });
+  } else {
+    chk.innerHTML = '';
+  }
+}
+
+/* ─── CARD TILT — desktop only ─── */
+if (window.matchMedia('(hover:hover) and (min-width:960px)').matches) {
+  document.querySelectorAll('.feat,.impact-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - .5;
+      const y = (e.clientY - r.top) / r.height - .5;
+      card.style.transform = `translateY(-8px) rotateX(${-y*5}deg) rotateY(${x*5}deg)`;
+    });
+    card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+  });
+}
+
+/* ─── INIT ─── */
+lucide.createIcons();
+applyStates();
+</script>
+</body>
+</html>
